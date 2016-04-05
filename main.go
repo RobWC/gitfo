@@ -45,20 +45,32 @@ func main() {
 		log.Fatal(err)
 	}
 
-	o, err := r.Lookup(idx_id)
+	err = idx.Write()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	tree, err := *o.AsTree()
+	tree, err := r.LookupTree(idx_id)
 	if err != nil {
+		log.Fatal(err)
+	}
+
+	head, err := r.Head()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	commit, err := r.LookupCommit(head.Target())
+	if err != nil {
+		log.Println("lookup commit")
 		log.Fatal(err)
 	}
 
 	sig := &git2go.Signature{Name: "Rob Cameron", Email: "rwcameron@gmail.com", When: time.Now()}
 
-	id, err := r.CreateCommit("HEAD", sig, sig, "Updating happiness", tree, nil)
+	id, err := r.CreateCommit("HEAD", sig, sig, "Updating happiness", tree, commit)
 	if err != nil {
+		log.Println("commit")
 		log.Fatal(err)
 	}
 
